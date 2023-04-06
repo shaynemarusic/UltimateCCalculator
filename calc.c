@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <math.h>
 
+//Prototypes
+
+//Menus
 void ScalarOpsMenu();
 int PrintInitialMenu();
+void MatrixOpsMenu();
+
+//Scalar Function Prototypes
 double ScalarAddition(double * result);
 double ScalarSubtraction(double * result);
 double ScalarMultiplication(double * result);
@@ -20,6 +26,7 @@ int main() {
                 ScalarOpsMenu();
                 break;
             case (2):
+                MatrixOpsMenu();
                 break;
             case (3):
                 cont = 0;
@@ -31,6 +38,8 @@ int main() {
     }
     return 0;
 }
+
+//Menu Function Definitions
 
 int PrintInitialMenu() {
     printf("What would you like to do?\n1. Scalar Math\n2. Matrix Math\n3. Exit\n");
@@ -83,6 +92,12 @@ void ScalarOpsMenu() {
         }
     }
 }
+
+void MatrixOpsMenu() {
+    
+}
+
+//Scalar Operation Definitions
 
 double ScalarAddition(double * result) {
     double operand1;
