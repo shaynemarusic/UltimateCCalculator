@@ -24,9 +24,12 @@ double ScalarDivision(double * result);
 int ScalarModulo(double * result);
 double ScalarExponentiation(double * result);
 
+//Matrix Function Prototypes
+void MatrixScalarMultiplicationInterface(Matrix * result);
 void MatrixAdditionInterface(Matrix * result);
 double ** UserInitializeMatrix(int height, int width);
 double ** MatrixAddition(double ** matrix1, double ** matrix2, int height, int width);
+double ** MatrixScalarMultiplication(double ** matrix, double scalar, int height, int width);
 void PrintMatrix(double ** matrix, int height, int width);
 void DestroyMatrix(double ** matrix, int height, int width);
 double ** InitializeZeroMatrix(int height, int width);
@@ -111,7 +114,6 @@ void ScalarOpsMenu() {
 void MatrixOpsMenu() {
     int input;
     int cont = 1;
-    Matrix resultBuffer;
     Matrix result = {0, NULL, 0, 0};
     while (cont) {
         printf("What matrix operation would you like to perform?\n1. Addition\n2. Scalar Multiplication\n3. Matrix Multiplication\n4. Calculate Determinant\n5. Invert\n6. Diagonalize\n7. Clear Results\n8. Exit\n");
@@ -121,8 +123,7 @@ void MatrixOpsMenu() {
                 MatrixAdditionInterface(&result);
                 break;
             case 2:
-                double ** mat = InitializeZeroMatrix(2, 2);
-                PrintMatrix(mat, 2, 2);
+                MatrixScalarMultiplicationInterface(&result);
                 break;
             case 3:
                 break;
@@ -295,9 +296,11 @@ void MatrixAdditionInterface(Matrix * result) {
     if (result->matrix != NULL) {
         printf("Initialize matrix: \n");
         matrix1 = UserInitializeMatrix(result->height, result->width);
+        double ** hold = result->matrix;
         result->matrix = MatrixAddition(result->matrix, matrix1, result->height, result->width);
         PrintMatrix(result->matrix, result->height, result->width);
         DestroyMatrix(matrix1, result->height, result->width);
+        DestroyMatrix(hold, result->height, result->width);
     }
     else {
         printf("Enter matrices' height: ");
@@ -354,4 +357,45 @@ double ** InitializeZeroMatrix(int height, int width) {
         }
     }
     return matrix;
+}
+
+void MatrixScalarMultiplicationInterface(Matrix * result) {
+    int height;
+    int width;
+    double scalar;
+    double ** matrix1 = NULL;
+    if (result->matrix != NULL) {
+        printf("Enter scalar: ");
+        scanf("%lf", &scalar);
+        double ** hold = result->matrix;
+        result->matrix = MatrixScalarMultiplication(result->matrix, scalar, result->height, result->width);
+        PrintMatrix(result->matrix, result->height, result->width);
+        DestroyMatrix(hold, result->height, result->width);
+    }
+    else {
+        printf("Enter matrix height: ");
+        scanf("%d", &height);
+        printf("Enter first matrix width: ");
+        scanf("%d", &width);
+        printf("Initialize matrix:\n");
+        matrix1 = UserInitializeMatrix(height, width);
+        printf("Enter scalar: ");
+        scanf("%lf", &scalar);
+        result->matrix = MatrixScalarMultiplication(matrix1, scalar, height, width);
+        result->height = height;
+        result->width = width;
+        PrintMatrix(result->matrix, height, width);
+        DestroyMatrix(matrix1, height, width);
+    }
+}
+
+double ** MatrixScalarMultiplication(double ** matrix, double scalar, int height, int width) {
+    double ** result = (double **) calloc(height, sizeof(double*));
+    for (int i = 0; i < height; i++) {
+        result[i] = (double *) calloc(width, sizeof(double));
+        for (int j = 0; j < width; j++) {
+            result[i][j] = matrix[i][j] * scalar;
+        }
+    }
+    return result;
 }
