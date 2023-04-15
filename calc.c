@@ -27,11 +27,13 @@ double ScalarExponentiation(double * result);
 //Matrix Function Prototypes
 void MatrixScalarMultiplicationInterface(Matrix * result);
 void MatrixAdditionInterface(Matrix * result);
+void MatrixCompositionInterface(Matrix * result);
 double ** UserInitializeMatrix(int height, int width);
 double ** MatrixAddition(double ** matrix1, double ** matrix2, int height, int width);
 double ** MatrixScalarMultiplication(double ** matrix, double scalar, int height, int width);
 void PrintMatrix(double ** matrix, int height, int width);
 void DestroyMatrix(double ** matrix, int height, int width);
+double ** InitializeIdentityMatrix(int height, int width);
 double ** InitializeZeroMatrix(int height, int width);
 
 int main() {
@@ -126,6 +128,7 @@ void MatrixOpsMenu() {
                 MatrixScalarMultiplicationInterface(&result);
                 break;
             case 3:
+                MatrixCompositionInterface(&result);
                 break;
             case 4:
                 break;
@@ -398,4 +401,34 @@ double ** MatrixScalarMultiplication(double ** matrix, double scalar, int height
         }
     }
     return result;
+}
+
+double ** InitializeIdentityMatrix(int height, int width) {
+    double ** result = (double **) calloc(height, sizeof(double *));
+    for (int i = 0; i < height; i++) {
+        result[i] = (double *) calloc(width, sizeof(double));
+        for (int j = 0; j < width; j++) {
+            if (i == j) {
+                result[i][j] = 1;
+            }
+            else {
+                result[i][j] = 0;
+            }
+        }
+    }
+    return result;
+}
+
+void MatrixCompositionInterface(Matrix * result) {
+    int leftHeight;
+    int sharedDimension;
+    int rightWidth;
+    double ** matrix1 = NULL;
+    double ** matrix2 = NULL;
+    if (result->matrix != NULL) {
+
+    }
+    else {
+        
+    }
 }
