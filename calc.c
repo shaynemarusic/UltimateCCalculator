@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <math.h>
 
+typedef struct Matrix {
+    double determinant;
+    double ** matrix;
+    int height;
+    int width;
+} Matrix;
+
 //Prototypes
 
 //Menus
@@ -17,17 +24,12 @@ double ScalarDivision(double * result);
 int ScalarModulo(double * result);
 double ScalarExponentiation(double * result);
 
-void MatrixAdditionInterface(double * result);
+void MatrixAdditionInterface(Matrix * result);
 double ** UserInitializeMatrix(int height, int width);
 double ** MatrixAddition(double ** matrix1, double ** matrix2, int height, int width);
 void PrintMatrix(double ** matrix, int height, int width);
-
-typedef struct MatrixReturn {
-    double determinant;
-    double ** matrix;
-    int matrixHeight;
-    int matrixWidth;
-} MatrixReturn;
+void DestroyMatrix(double ** matrix, int height, int width);
+double ** InitializeZeroMatrix(int height, int width);
 
 int main() {
     printf("Welcome to the Ultimate C Calculator v1.0.1!\n");
@@ -109,15 +111,18 @@ void ScalarOpsMenu() {
 void MatrixOpsMenu() {
     int input;
     int cont = 1;
-    MatrixReturn resultBuffer;
-    double * result = NULL;
+    Matrix resultBuffer;
+    Matrix result = {0, NULL, 0, 0};
     while (cont) {
-        printf("What matrix operation would you like to perform?\n1. Addition\n2. Scalar Multiplication\n3. Matrix Multiplication\n4. Calculate Determinant\n5. Invert\n6. Diagonalize\n7. Clear Results\n8. Exit");
+        printf("What matrix operation would you like to perform?\n1. Addition\n2. Scalar Multiplication\n3. Matrix Multiplication\n4. Calculate Determinant\n5. Invert\n6. Diagonalize\n7. Clear Results\n8. Exit\n");
         scanf("%d", &input);
         switch (input) {
             case 1:
+                MatrixAdditionInterface(&result);
                 break;
             case 2:
+                double ** mat = InitializeZeroMatrix(2, 2);
+                PrintMatrix(mat, 2, 2);
                 break;
             case 3:
                 break;
@@ -128,13 +133,14 @@ void MatrixOpsMenu() {
             case 6:
                 break;
             case 7:
-                result = NULL;
+                DestroyMatrix(result.matrix, result.height, result.width);
+                result.matrix = NULL;
                 break;
             case 8:
                 cont = 0;
                 break;
             default:
-                printf("Not a valid menu selection. Please try again");
+                printf("Not a valid menu selection. Please try again\n");
         }
     }
 }
@@ -281,14 +287,17 @@ double ** UserInitializeMatrix(int height, int width) {
     return matrix;
 }
 
-void MatrixAdditionInterface(double * result) {
+void MatrixAdditionInterface(Matrix * result) {
     int height;
     int width;
     double ** matrix1 = NULL;
     double ** matrix2 = NULL;
-    double ** resMatrix = NULL;
-    if (result != NULL) {
-
+    if (result->matrix != NULL) {
+        printf("Initialize matrix: \n");
+        matrix1 = UserInitializeMatrix(result->height, result->width);
+        result->matrix = MatrixAddition(result->matrix, matrix1, result->height, result->width);
+        PrintMatrix(result->matrix, result->height, result->width);
+        DestroyMatrix(matrix1, result->height, result->width);
     }
     else {
         printf("Enter matrices' height: ");
@@ -296,10 +305,15 @@ void MatrixAdditionInterface(double * result) {
         printf("Enter first matrices' width: ");
         scanf("%d", &width);
         printf("Initialize first matrix:\n");
-        matrix1 = InitializeMatrix(height, width);
+        matrix1 = UserInitializeMatrix(height, width);
         printf("Initialize second matrix:\n");
-        matrix2 = InitializeMatrix(height, width);
-        
+        matrix2 = UserInitializeMatrix(height, width);
+        result->matrix = MatrixAddition(matrix1, matrix2, height, width);
+        result->height = height;
+        result->width = width;
+        PrintMatrix(result->matrix, height, width);
+        DestroyMatrix(matrix1, height, width);
+        DestroyMatrix(matrix2, height, width);
     }
 }
 
@@ -315,5 +329,29 @@ double ** MatrixAddition(double ** matrix1, double ** matrix2, int height, int w
 }
 
 void PrintMatrix(double ** matrix, int height, int width) {
-    
+    for (int i = 0; i < height; i++) {
+        printf("|");
+        for (int j = 0; j < width; j++) {
+            printf(" %lf ", matrix[i][j]);
+        }
+        printf("|\n");
+    }
+}
+
+void DestroyMatrix(double ** matrix, int height, int width) {
+    for (int i = 0; i < height; i++) {
+        free((void *) matrix[i]);
+    }
+    free((void *) matrix);
+}
+
+double ** InitializeZeroMatrix(int height, int width) {
+    double ** matrix = (double **) calloc(height, sizeof(double *));
+    for (int i = 0; i < height; i++) {
+        matrix[i] = (double *) calloc(width, sizeof(double));
+        for (int j = 0; j < width; j++) {
+            matrix[i][j] = 0;
+        }
+    }
+    return matrix;
 }
