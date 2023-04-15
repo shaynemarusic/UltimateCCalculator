@@ -31,6 +31,7 @@ void MatrixCompositionInterface(Matrix * result);
 double ** UserInitializeMatrix(int height, int width);
 double ** MatrixAddition(double ** matrix1, double ** matrix2, int height, int width);
 double ** MatrixScalarMultiplication(double ** matrix, double scalar, int height, int width);
+double ** MatrixComposition(double ** leftMatrix, double ** rightMatrix, int leftHeight, int sharedDimension, int rightWidth);
 void PrintMatrix(double ** matrix, int height, int width);
 void DestroyMatrix(double ** matrix, int height, int width);
 double ** InitializeIdentityMatrix(int height, int width);
@@ -426,9 +427,50 @@ void MatrixCompositionInterface(Matrix * result) {
     double ** matrix1 = NULL;
     double ** matrix2 = NULL;
     if (result->matrix != NULL) {
-
+        leftHeight = result->height;
+        sharedDimension = result->width;
+        printf("Enter width of right matrix: ");
+        scanf("%d", &rightWidth);
+        printf("Initialize right matrix:\n");
+        matrix1 = UserInitializeMatrix(sharedDimension, rightWidth);
+        double ** hold = result->matrix;
+        result->matrix = MatrixComposition(result->matrix, matrix1, leftHeight, sharedDimension, rightWidth);
+        PrintMatrix(result->matrix, leftHeight, rightWidth);
+        DestroyMatrix(hold, leftHeight, sharedDimension);
+        result->width = rightWidth;
     }
     else {
-        
+        printf("Enter height of left matrix: ");
+        scanf("%d", &leftHeight);
+        printf("Enter width of left matrix/height of right matrix: ");
+        scanf("%d", &sharedDimension);
+        printf("Initialize left matrix:\n");
+        matrix1 = UserInitializeMatrix(leftHeight, sharedDimension);
+        printf("Enter width of right matrix: ");
+        scanf("%d", &rightWidth);
+        printf("Initialize right matrix:\n");
+        matrix2 = UserInitializeMatrix(sharedDimension, rightWidth);
+        result->matrix = MatrixComposition(matrix1, matrix2, leftHeight, sharedDimension, rightWidth);
+        result->height = leftHeight;
+        result->width = rightWidth;
+        PrintMatrix(result->matrix, leftHeight, rightWidth);
+        DestroyMatrix(matrix1, leftHeight, sharedDimension);
+        DestroyMatrix(matrix2, sharedDimension, rightWidth);
     }
+}
+
+double ** MatrixComposition(double ** leftMatrix, double ** rightMatrix, int leftHeight, int sharedDimension, int rightWidth) {
+    double ** result = (double **) calloc(leftHeight, sizeof(double *));
+    double entry;
+    for (int i = 0; i < leftHeight; i++) {
+        result[i] = (double *) calloc(rightWidth, sizeof(double));
+        for (int j = 0; j < rightWidth; j++) {
+            entry = 0;
+            for (int k = 0; k < sharedDimension; k++) {
+                entry += leftMatrix[i][k] * rightMatrix[k][j];
+            }
+            result[i][j] = entry;
+        }
+    }
+    return result;
 }
